@@ -44,7 +44,7 @@ while True:
         user_input = input("Habari: ")
 
         if user_input.lower() in ["exit", "ondoka", "quit"]:
-            print("Chatbot: Kwa heri! Tutaonana tena.")
+            print("Chatbot: Kwa heri! Tanesco tunayaangaza maisha yako.")
             break
 
         response = chatbot.get_response(user_input)
