@@ -31,7 +31,7 @@ warnings.filterwarnings("ignore", category=SAWarning)
 # response = chatbot.get_response("Au revoir!")
 # print(response)
 
-chatbot = ChatBot("SwahiliBot")
+chatbot = ChatBot("TanescoBot")
 
 # Create a trainer and train with the custom Swahili corpus
 trainer = ChatterBotCorpusTrainer(chatbot)
@@ -39,6 +39,15 @@ trainer.train("./swahili/tanesco.yml")  # Path to your Tanesco Huduma kwa wateja
 
 # Interactive terminal chat loop
 print("Karibu! Tanesco huduma kwa wateja (andika 'exit' kuondoka).")
+def get_custom_response(user_input):
+    # Check for area input
+    if "eneo langu ni" in user_input.lower():
+        area = user_input.split("eneo langu ni")[-1].strip()
+        return f"Ahsante kwa taarifa! Tumepokea malalamiko kutoka {area}, timu yetu iko kazini kuboresha huduma."
+    else:
+        return chatbot.get_response(user_input)
+
+# Chat loop
 while True:
     try:
         user_input = input("Habari: ")
@@ -47,8 +56,13 @@ while True:
             print("Chatbot: Kwa heri! Tanesco tunayaangaza maisha yako.")
             break
 
-        response = chatbot.get_response(user_input)
-        print("Chatbot:", response)
+        response = get_custom_response(user_input)
+
+        # Check confidence if it's a ChatterBot response object
+        if hasattr(response, 'confidence') and response.confidence < 0.5:
+            print("Chatbot: Tafadhali fika ofisi iliopo karibu na wewe au uliza swali lengine, ahsante.")
+        else:
+            print("Chatbot:", response)
 
     except (KeyboardInterrupt, EOFError):
         print("\nChatbot: Kwa heri!")
