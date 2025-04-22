@@ -162,15 +162,37 @@
 #     except Exception as e:
 #         print(f"Chatbot: Samahani, kuna tatizo la kiufundi: {str(e)}")
 
+# --- DeepSeek Test Function ---
+# def test_deepseek_connection():
+#     try:
+#         test_response = client.chat.completions.create(
+#             model="deepseek-ai/deepseek-r1",
+#             messages=[{"role": "user", "content": "Sema 'Hello' kwa Kiswahili"}],
+#             max_tokens=10
+#         )
+#         # print("\nDeepSeek Test Result:", test_response.choices[0].message.content)
+#         # print("✅ DeepSeek is working correctly!")
+#         return True
+#     except Exception as e:
+#         print("\n❌ DeepSeek Connection Failed:", str(e))
+#         return False
+#
+#
+# # Run connection test
+# if not test_deepseek_connection():
+#     exit("Please check your DeepSeek API key and connection.")
 
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.response_selection import get_first_response
 from dotenv import load_dotenv
-from openai import OpenAI  # DeepSeek uses OpenAI-compatible API
+from openai import OpenAI
 import os
 import warnings
 from sqlalchemy.exc import SAWarning
+from sqlalchemy import create_engine, Column, String, Integer, JSON
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 # Suppress SQLAlchemy warnings
 warnings.filterwarnings("ignore", category=SAWarning)
@@ -178,11 +200,34 @@ warnings.filterwarnings("ignore", category=SAWarning)
 # Load environment variables
 load_dotenv()
 
-# Initialize DeepSeek client (using OpenAI-compatible format)
+# Initialize DeepSeek client
 client = OpenAI(
-    api_key=os.getenv("DEEPSEEK_API_KEY"),  # Add DEEPSEEK_API_KEY to .env
-    base_url="https://integrate.api.nvidia.com/v1"  # DeepSeek API endpoint
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url="https://integrate.api.nvidia.com/v1"
 )
+
+# SQLAlchemy setup for session storage
+Base = declarative_base()
+
+
+class UserSession(Base):
+    __tablename__ = 'user_sessions'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(String, unique=True)
+    history = Column(JSON)  # Stores conversation history as JSON
+    context = Column(JSON)  # Stores any additional context
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.history = []
+        self.context = {}
+
+
+# Initialize database
+engine = create_engine('sqlite:///sessions.db')
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
 
 # Initialize ChatterBot
 chatbot = ChatBot(
@@ -205,27 +250,6 @@ trainer.train("./swahili/tanesco.yml")
 print("Karibu! Tanesco huduma kwa wateja (andika 'exit' kuondoka).")
 
 
-# --- DeepSeek Test Function ---
-# def test_deepseek_connection():
-#     try:
-#         test_response = client.chat.completions.create(
-#             model="deepseek-ai/deepseek-r1",
-#             messages=[{"role": "user", "content": "Sema 'Hello' kwa Kiswahili"}],
-#             max_tokens=10
-#         )
-#         # print("\nDeepSeek Test Result:", test_response.choices[0].message.content)
-#         # print("✅ DeepSeek is working correctly!")
-#         return True
-#     except Exception as e:
-#         print("\n❌ DeepSeek Connection Failed:", str(e))
-#         return False
-#
-#
-# # Run connection test
-# if not test_deepseek_connection():
-#     exit("Please check your DeepSeek API key and connection.")
-
-
 # Custom response logic (unchanged)
 def get_custom_response(user_input):
     user_input = user_input.lower().strip()
@@ -235,8 +259,8 @@ def get_custom_response(user_input):
     return chatbot.get_response(user_input)
 
 
-# Modified for DeepSeek
-def get_deepseek_response(prompt):
+# Modified for DeepSeek with session context
+def get_deepseek_response(prompt, session_context=None):
     try:
         system_message = """
         Wewe ni msaidizi wa TANESCO unaojibu maswali kwa Kiswahili kuhusu:
@@ -247,18 +271,31 @@ def get_deepseek_response(prompt):
         Jibu kwa ufupi na kwa lugha rahisi ya Kiswahili.
         Kama hujui jibu, sema 'Samahani, siwezi kukusaidia kwa hili. Tafadhali piga 0748 123 456.'
         """
+
+        messages = [{"role": "system", "content": system_message}]
+
+        # Add session context if available
+        if session_context and session_context.get('history'):
+            for role, content in session_context['history'][-5:]:  # Last 5 messages
+                messages.append({"role": "user" if role == "user" else "assistant", "content": content})
+
+        messages.append({"role": "user", "content": prompt})
+
         response = client.chat.completions.create(
-            model="deepseek-ai/deepseek-r1",  # DeepSeek model
-            messages=[
-                {"role": "system", "content": "Huduma kwa wateja"},
-                {"role": "user", "content": prompt}
-            ],
+            model="deepseek-ai/deepseek-r1",
+            messages=messages,
             temperature=0.3,
-            top_p = 0.7,
-            max_tokens = 4096,
-            stream = True
+            top_p=0.7,
+            max_tokens=4096,
+            stream=True
         )
-        return response.choices[0].message.content.strip()
+
+        # For streaming response, you might need to collect chunks
+        full_response = ""
+        for chunk in response:
+            if chunk.choices[0].delta.content:
+                full_response += chunk.choices[0].delta.content
+        return full_response.strip()
     except Exception as e:
         print(f"DeepSeek Error: {e}")
         return "Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye."
@@ -270,31 +307,62 @@ def should_use_deepseek(response):
         if str(response) == chatbot.default_response:
             return True
         if hasattr(response, 'confidence'):
-            return response.confidence < 0.6
+            return response.confidence < 0.1
         return False
     except:
         return False
 
 
-# Main chat loop (modified for DeepSeek)
+# Main chat loop with session management
 while True:
+    db_session = Session()  # Create a new database session for each iteration
     try:
         user_input = input("Habari: ")
+        user_id = "default_user"  # In a real app, get this from user authentication
+
+
+        # Get or create user session
+        session = db_session.query(UserSession).filter_by(user_id=user_id).first()
+        if not session:
+            session = UserSession(user_id)
+            db_session.add(session)
+            db_session.commit()
+
+        # Update history with user input
+        session.history.append(("user", user_input))
+        db_session.commit()
+
         if user_input.lower() in ["exit", "ondoka", "quit", "hapana", "bye"]:
             print("Chatbot: Kwa heri! Tanesco tunayaangaza maisha yako.")
+            # Optionally clear the session when user exits
+            db_session.delete(session)
+            db_session.commit()
             break
 
+        # Get response
         response = get_custom_response(user_input)
 
         if should_use_deepseek(response):
             print("Chatbot: (Ninatafuta jibu sahihi zaidi...)")
-            ai_reply = get_deepseek_response(user_input)
+            # Pass session context to DeepSeek
+            ai_reply = get_deepseek_response(user_input, session_context={
+                'history': session.history,
+                'context': session.context
+            })
             print("Chatbot:", ai_reply)
+            # Store bot response in history
+            session.history.append(("bot", ai_reply))
+            db_session.commit()
         else:
             print("Chatbot:", response)
+            # Store bot response in history
+            session.history.append(("bot", str(response)))
+            db_session.commit()
 
     except (KeyboardInterrupt, EOFError):
         print("\nChatbot: Kwa heri!")
         break
     except Exception as e:
         print(f"Chatbot: Samahani, kuna tatizo: {str(e)}")
+    finally:
+        db_session.close()  # Ensure session is closed properly
