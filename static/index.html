@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanesco Chatbot</title>
+    <style>
+    /* DeepSeek-like typography with TIMS green colors */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    :root {
+        --ds-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        --tims-green: #2e7d32;  /* Primary green */
+        --tims-green-light: #4caf50;  /* Lighter green */
+        --tims-green-dark: #1b5e20;  /* Darker green */
+        --tims-green-bg: #e8f5e9;  /* Light message background */
+    }
+
+    #chat-container {
+        position: fixed;
+        bottom: 90px;
+        right: 20px;
+        width: 350px;
+        height: 500px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        border: 1px solid #e0e0e0;
+        overflow: hidden;
+        font-family: var(--ds-font);
+    }
+
+    #chat-header {
+        background: var(--tims-green);
+        color: white;
+        padding: 16px 20px;
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 500;
+        font-size: 15px;
+    }
+
+    #chat-messages {
+        flex-grow: 1;
+        padding: 16px;
+        overflow-y: auto;
+        background-color: #fafafa;
+    }
+
+    #chat-input {
+        padding: 12px 16px;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        background: white;
+        gap: 8px;
+    }
+
+    #chat-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--tims-green);
+        color: white;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        z-index: 1001;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    #chat-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4);
+    }
+
+    #user-input {
+        flex-grow: 1;
+        padding: 10px 16px;
+        border: 1px solid #e0e0e0;
+        border-radius: 24px;
+        outline: none;
+        font-size: 14px;
+        font-family: var(--ds-font);
+        transition: border-color 0.2s;
+    }
+
+    #user-input:focus {
+        border-color: var(--tims-green-light);
+    }
+
+    .message {
+        margin-bottom: 12px;
+        padding: 10px 16px;
+        border-radius: 18px;
+        max-width: 80%;
+        font-size: 14px;
+        line-height: 1.5;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .user-message {
+        background: var(--tims-green);
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 4px;
+    }
+
+    .bot-message {
+        background: var(--tims-green-bg);
+        color: #333;
+        margin-right: auto;
+        border-bottom-left-radius: 4px;
+    }
+
+    #send-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--tims-green);
+        color: white;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    #send-button:hover {
+        background: var(--tims-green-dark);
+    }
+
+    #send-button:active {
+        transform: scale(0.95);
+    }
+
+    #send-button svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Custom scrollbar */
+    #chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    #chat-messages::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+        background: #c8e6c9;
+        border-radius: 3px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+        background: var(--tims-green-light);
+    }
+</style>
+</head>
+<body>
+    <!-- Chat toggle button -->
+    <div id="chat-toggle" onclick="toggleChat()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <!-- Chat container -->
+    <div id="chat-container">
+        <div id="chat-header">
+            <span>Tanesco Chatbot</span>
+            <span onclick="toggleChat()" style="cursor: pointer;">×</span>
+        </div>
+        <div id="chat-messages"></div>
+        <div id="chat-input">
+            <input type="text" id="user-input" placeholder="Andika ujumbe hapa..." style="width: 70%; padding: 8px;">
+            <button onclick="sendMessage()" id="send-button" style="
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #0056b3;
+    color: white;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-left: 10px;
+">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 2L11 13"></path>
+        <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+    </svg>
+</button>
+        </div>
+    </div>
+
+    <script>
+        let chatOpen = false;
+
+        function toggleChat() {
+            const chatContainer = document.getElementById('chat-container');
+            chatOpen = !chatOpen;
+            chatContainer.style.display = chatOpen ? 'flex' : 'none';
+
+            if (chatOpen) {
+                // Add welcome message when chat opens
+                addMessage('bot', 'Karibu! Tanesco huduma kwa wateja. Unaweza kuuliza swali lolote kuhusu umeme.');
+            }
+        }
+
+        function addMessage(sender, text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender + '-message');
+            messageDiv.textContent = text;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+
+            if (message) {
+                addMessage('user', message);
+                input.value = '';
+
+                // Send to backend
+                fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    addMessage('bot', data.response);
+                })
+                .catch(error => {
+                    addMessage('bot', 'Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye.');
+                });
+            }
+        }
+
+        // Allow pressing Enter to send message
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

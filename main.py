@@ -182,6 +182,193 @@
 # if not test_deepseek_connection():
 #     exit("Please check your DeepSeek API key and connection.")
 
+# from chatterbot import ChatBot
+# from chatterbot.trainers import ChatterBotCorpusTrainer
+# from chatterbot.response_selection import get_first_response
+# from dotenv import load_dotenv
+# from openai import OpenAI
+# import os
+# import warnings
+# from sqlalchemy.exc import SAWarning
+# from sqlalchemy import create_engine, Column, String, Integer, JSON
+# from sqlalchemy.ext.declarative import declarative_base
+# from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.orm import declarative_base
+#
+# # Suppress SQLAlchemy warnings
+# warnings.filterwarnings("ignore", category=SAWarning)
+#
+# # Load environment variables
+# load_dotenv()
+#
+# # Initialize DeepSeek client
+# client = OpenAI(
+#     api_key=os.getenv("DEEPSEEK_API_KEY"),
+#     base_url="https://integrate.api.nvidia.com/v1"
+# )
+#
+# # SQLAlchemy setup for session storage
+# Base = declarative_base()
+#
+#
+# class UserSession(Base):
+#     __tablename__ = 'user_sessions'
+#
+#     id = Column(Integer, primary_key=True)
+#     user_id = Column(String, unique=True)
+#     history = Column(JSON)  # Stores conversation history as JSON
+#     context = Column(JSON)  # Stores any additional context
+#
+#     def __init__(self, user_id):
+#         self.user_id = user_id
+#         self.history = []
+#         self.context = {}
+#
+#
+# # Initialize database
+# engine = create_engine('sqlite:///sessions.db')
+# Base.metadata.create_all(engine)
+# Session = sessionmaker(bind=engine)
+#
+# # Initialize ChatterBot
+# chatbot = ChatBot(
+#     "TanescoBot",
+#     storage_adapter='chatterbot.storage.SQLStorageAdapter',
+#     logic_adapters=[
+#         {
+#             'import_path': 'chatterbot.logic.BestMatch',
+#             'default_response': 'Samahani, sijaelewa swali lako. Unaweza kulisema kwa njia nyingine?',
+#             'maximum_similarity_threshold': 0.65
+#         }
+#     ],
+#     response_selection_method=get_first_response
+# )
+#
+# # Train the bot
+# trainer = ChatterBotCorpusTrainer(chatbot)
+# trainer.train("./swahili/tanesco.yml")
+#
+# print("Karibu! Tanesco huduma kwa wateja (andika 'exit' kuondoka).")
+#
+#
+# # Custom response logic (unchanged)
+# def get_custom_response(user_input):
+#     user_input = user_input.lower().strip()
+#     if "eneo langu ni" in user_input:
+#         area = user_input.split("eneo langu ni")[-1].strip()
+#         return f"Ahsante kwa taarifa! Tumepokea malalamiko kutoka {area}, timu yetu iko kazini kuboresha huduma."
+#     return chatbot.get_response(user_input)
+#
+#
+# # Modified for DeepSeek with session context
+# def get_deepseek_response(prompt, session_context=None):
+#     try:
+#         system_message = """
+#         Wewe ni msaidizi wa TANESCO unaojibu maswali kwa Kiswahili kuhusu:
+#         - Matatizo ya umeme
+#         - Malipo ya bili
+#         - Uunganishaji wa umeme mpya
+#         - Huduma kwa wateja
+#         Jibu kwa ufupi na kwa lugha rahisi ya Kiswahili.
+#         Kama hujui jibu, sema 'Samahani, siwezi kukusaidia kwa hili. Tafadhali piga 0748 123 456.'
+#         """
+#
+#         messages = [{"role": "system", "content": system_message}]
+#
+#         # Add session context if available
+#         if session_context and session_context.get('history'):
+#             for role, content in session_context['history'][-5:]:  # Last 5 messages
+#                 messages.append({"role": "user" if role == "user" else "assistant", "content": content})
+#
+#         messages.append({"role": "user", "content": prompt})
+#
+#         response = client.chat.completions.create(
+#             model="deepseek-ai/deepseek-r1",
+#             messages=messages,
+#             temperature=0.3,
+#             top_p=0.7,
+#             max_tokens=4096,
+#             stream=True
+#         )
+#
+#         # For streaming response, you might need to collect chunks
+#         full_response = ""
+#         for chunk in response:
+#             if chunk.choices[0].delta.content:
+#                 full_response += chunk.choices[0].delta.content
+#         return full_response.strip()
+#     except Exception as e:
+#         print(f"DeepSeek Error: {e}")
+#         return "Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye."
+#
+#
+# # Confidence check (unchanged)
+# def should_use_deepseek(response):
+#     try:
+#         if str(response) == chatbot.default_response:
+#             return True
+#         if hasattr(response, 'confidence'):
+#             return response.confidence < 0.1
+#         return False
+#     except:
+#         return False
+#
+#
+# # Main chat loop with session management
+# while True:
+#     db_session = Session()  # Create a new database session for each iteration
+#     try:
+#         user_input = input("Habari: ")
+#         user_id = "default_user"  # In a real app, get this from user authentication
+#
+#
+#         # Get or create user session
+#         session = db_session.query(UserSession).filter_by(user_id=user_id).first()
+#         if not session:
+#             session = UserSession(user_id)
+#             db_session.add(session)
+#             db_session.commit()
+#
+#         # Update history with user input
+#         session.history.append(("user", user_input))
+#         db_session.commit()
+#
+#         if user_input.lower() in ["exit", "ondoka", "quit", "hapana", "bye"]:
+#             print("Chatbot: Kwa heri! Tanesco tunayaangaza maisha yako.")
+#             # Optionally clear the session when user exits
+#             db_session.delete(session)
+#             db_session.commit()
+#             break
+#
+#         # Get response
+#         response = get_custom_response(user_input)
+#
+#         if should_use_deepseek(response):
+#             print("Chatbot: (Ninatafuta jibu sahihi zaidi...)")
+#             # Pass session context to DeepSeek
+#             ai_reply = get_deepseek_response(user_input, session_context={
+#                 'history': session.history,
+#                 'context': session.context
+#             })
+#             print("Chatbot:", ai_reply)
+#             # Store bot response in history
+#             session.history.append(("bot", ai_reply))
+#             db_session.commit()
+#         else:
+#             print("Chatbot:", response)
+#             # Store bot response in history
+#             session.history.append(("bot", str(response)))
+#             db_session.commit()
+#
+#     except (KeyboardInterrupt, EOFError):
+#         print("\nChatbot: Kwa heri!")
+#         break
+#     except Exception as e:
+#         print(f"Chatbot: Samahani, kuna tatizo: {str(e)}")
+#     finally:
+#         db_session.close()  # Ensure session is closed properly
+
+from flask import Flask, request, jsonify
 from chatterbot import ChatBot
 from chatterbot.trainers import ChatterBotCorpusTrainer
 from chatterbot.response_selection import get_first_response
@@ -191,8 +378,10 @@ import os
 import warnings
 from sqlalchemy.exc import SAWarning
 from sqlalchemy import create_engine, Column, String, Integer, JSON
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base
+
+app = Flask(__name__)
 
 # Suppress SQLAlchemy warnings
 warnings.filterwarnings("ignore", category=SAWarning)
@@ -206,22 +395,16 @@ client = OpenAI(
     base_url="https://integrate.api.nvidia.com/v1"
 )
 
-# SQLAlchemy setup for session storage
+# SQLAlchemy setup
 Base = declarative_base()
 
 
 class UserSession(Base):
     __tablename__ = 'user_sessions'
-
     id = Column(Integer, primary_key=True)
     user_id = Column(String, unique=True)
-    history = Column(JSON)  # Stores conversation history as JSON
-    context = Column(JSON)  # Stores any additional context
-
-    def __init__(self, user_id):
-        self.user_id = user_id
-        self.history = []
-        self.context = {}
+    history = Column(JSON)
+    context = Column(JSON)
 
 
 # Initialize database
@@ -231,7 +414,7 @@ Session = sessionmaker(bind=engine)
 
 # Initialize ChatterBot
 chatbot = ChatBot(
-    "TanescoBot",
+    "Esco-Bot",
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
     logic_adapters=[
         {
@@ -245,12 +428,9 @@ chatbot = ChatBot(
 
 # Train the bot
 trainer = ChatterBotCorpusTrainer(chatbot)
-trainer.train("./swahili/tanesco.yml")
-
-print("Karibu! Tanesco huduma kwa wateja (andika 'exit' kuondoka).")
+trainer.train("./")
 
 
-# Custom response logic (unchanged)
 def get_custom_response(user_input):
     user_input = user_input.lower().strip()
     if "eneo langu ni" in user_input:
@@ -259,24 +439,14 @@ def get_custom_response(user_input):
     return chatbot.get_response(user_input)
 
 
-# Modified for DeepSeek with session context
 def get_deepseek_response(prompt, session_context=None):
     try:
-        system_message = """
-        Wewe ni msaidizi wa TANESCO unaojibu maswali kwa Kiswahili kuhusu:
-        - Matatizo ya umeme
-        - Malipo ya bili
-        - Uunganishaji wa umeme mpya
-        - Huduma kwa wateja
-        Jibu kwa ufupi na kwa lugha rahisi ya Kiswahili.
-        Kama hujui jibu, sema 'Samahani, siwezi kukusaidia kwa hili. Tafadhali piga 0748 123 456.'
-        """
+        system_message = """Wewe ni msaidizi wa TANESCO..."""  # Your existing system message
 
         messages = [{"role": "system", "content": system_message}]
 
-        # Add session context if available
         if session_context and session_context.get('history'):
-            for role, content in session_context['history'][-5:]:  # Last 5 messages
+            for role, content in session_context['history'][-5:]:
                 messages.append({"role": "user" if role == "user" else "assistant", "content": content})
 
         messages.append({"role": "user", "content": prompt})
@@ -286,22 +456,15 @@ def get_deepseek_response(prompt, session_context=None):
             messages=messages,
             temperature=0.3,
             top_p=0.7,
-            max_tokens=4096,
-            stream=True
+            max_tokens=4096
         )
 
-        # For streaming response, you might need to collect chunks
-        full_response = ""
-        for chunk in response:
-            if chunk.choices[0].delta.content:
-                full_response += chunk.choices[0].delta.content
-        return full_response.strip()
+        return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"DeepSeek Error: {e}")
         return "Samahani, kuna tatizo la kiufundi. Tafadhali jaribu tena baadaye."
 
 
-# Confidence check (unchanged)
 def should_use_deepseek(response):
     try:
         if str(response) == chatbot.default_response:
@@ -313,56 +476,57 @@ def should_use_deepseek(response):
         return False
 
 
-# Main chat loop with session management
-while True:
-    db_session = Session()  # Create a new database session for each iteration
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.json
+    user_input = data['message']
+    user_id = "web_user"  # You might want to use session cookies in a real app
+
+    db_session = Session()
     try:
-        user_input = input("Habari: ")
-        user_id = "default_user"  # In a real app, get this from user authentication
-
-
-        # Get or create user session
         session = db_session.query(UserSession).filter_by(user_id=user_id).first()
         if not session:
-            session = UserSession(user_id)
+            session = UserSession(user_id=user_id)
             db_session.add(session)
             db_session.commit()
 
-        # Update history with user input
+        # Update history
+        session.history = session.history or []
         session.history.append(("user", user_input))
         db_session.commit()
 
         if user_input.lower() in ["exit", "ondoka", "quit", "hapana", "bye"]:
-            print("Chatbot: Kwa heri! Tanesco tunayaangaza maisha yako.")
-            # Optionally clear the session when user exits
             db_session.delete(session)
             db_session.commit()
-            break
+            return jsonify({"response": "Kwa heri! Tanesco tunayaangaza maisha yako."})
 
         # Get response
         response = get_custom_response(user_input)
 
         if should_use_deepseek(response):
-            print("Chatbot: (Ninatafuta jibu sahihi zaidi...)")
-            # Pass session context to DeepSeek
             ai_reply = get_deepseek_response(user_input, session_context={
                 'history': session.history,
                 'context': session.context
             })
-            print("Chatbot:", ai_reply)
-            # Store bot response in history
             session.history.append(("bot", ai_reply))
             db_session.commit()
+            return jsonify({"response": ai_reply})
         else:
-            print("Chatbot:", response)
-            # Store bot response in history
             session.history.append(("bot", str(response)))
             db_session.commit()
+            return jsonify({"response": str(response)})
 
-    except (KeyboardInterrupt, EOFError):
-        print("\nChatbot: Kwa heri!")
-        break
     except Exception as e:
-        print(f"Chatbot: Samahani, kuna tatizo: {str(e)}")
+        print(f"Error: {e}")
+        return jsonify({"response": "Samahani, kuna tatizo. Tafadhali jaribu tena baadaye."})
     finally:
-        db_session.close()  # Ensure session is closed properly
+        db_session.close()
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

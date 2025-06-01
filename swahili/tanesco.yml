@@ -3,80 +3,106 @@ categories:
 - Huduma kwa Wateja
 
 conversations:
-- - Umeme umekatika eneo langu.
+  - - Hujambo
+    - Sijambo, karibu!
+  - - Habari yako?
+    - Nzuri sana, asante. Na wewe je?
+  - - Unaitwa nani?
+    - Ninaitwa Chatbot wa Kiswahili.
+  - - Wewe ni nani?
+    - Mimi ni msaidizi wa kidijitali.
+  - - Je tunweza kuchati?
+    - Ndiyo tunaweza kuchati karibu tukuhdumie!
+  - - Je unaweza kuchati kikabila
+    - Hapana naweza kiswahili tu!
+  - - Nina tatizo
+    - Karibu nikuhudumie tafadhali.
+
+  - - Umeme umekatika eneo langu.
   - Samahani kwa usumbufu. Tafadhali taja jina la eneo lako ili tuangalie tatizo.
-- - Umeme umerudi kwa muda kisha ukakatika tena.
+  - - Umeme umerudi kwa muda kisha ukakatika tena.
   - Tunaweza kuwa na hitilafu ya muda. Tafadhali subiri dakika chache au tuma taarifa kupitia namba yetu ya huduma kwa wateja.
-- - Nawezaje kulipa bili ya umeme?
-  - Unaweza kulipa kupitia M-Pesa, Tigo Pesa, Airtel Money, au benki yoyote iliyo karibu nawe.
-- - Nimepoteza risiti ya malipo ya umeme.
-  - Tafadhali wasiliana na ofisi ya TANESCO au tuma ujumbe kwa huduma kwa wateja ukiambatanisha taarifa za malipo.
-- - Nawezaje kuunganishiwa umeme mpya?
-  - Tafadhali tembelea ofisi ya TANESCO iliyo karibu au tembelea tovuti yetu kwa kujaza fomu ya maombi ya kuunganishiwa umeme.
-- - Namba yangu ya mita ni ipi?
-  - Namba ya mita yako ina tarakimu 11 na iko kwenye kifaa cha mita au kwenye risiti ya mwisho ya malipo.
-- - Umeme wangu hukatika kila siku jioni.
-  - Tunaomba radhi kwa usumbufu. Inawezekana kuna mzigo mkubwa kwenye laini. Tutalifanyia kazi.
-- - Nawezaje kuwasiliana na huduma kwa wateja?
-  - Tafadhali piga 0748 123 456 au tuma barua pepe kwa support@tanesco.co.tz
-- - Naweza kupata taarifa ya matumizi yangu ya umeme?
-  - Ndiyo, tafadhali tuma namba yako ya mita kwa huduma kwa wateja na tutakutumia taarifa kamili.
-- - Umeme unakatika sana wiki hii, shida ni nini?
-  - Kuna matengenezo ya miundombinu yanayoendelea. Tafadhali fuatilia tangazo rasmi kutoka TANESCO kuhusu eneo lako.
-- - Naweza kujua mita namba yangu
-  - Ndiyo unaweza kujua kwa kuangalia rimoti yako chini ya display yenye tarakimu 13, kwa mawasiliano zaidi piga 0748550000
-- - Eneo langu ni " "
-  - Ahsante tumepokea taarifa na samahani kwa changamoto waatalamu wetu wako site kuboresha huduma zetu
-- - Napata vipi huduma ya kuunganishiwa umeme?
-  - Huduma ya kuunganishiwa umeme unaweza fanikiwa kwa njia zifatazo 1.pakua app ya nikonekt 2.tembelea tovuti ya www.nikonekt.co.tz 3.Au tembelea ofisi za tanesco zilizopo karibu na wewe!
-- - Je kuna nafasi za kazi au ajira hapo Tanesco
-  - Hapana tunapenda kukutaarifu endelea kupitia tovuti zetu na vyombo vya habari kwa maelekezo zaidi
-- - Je Tanesco makao makuu yake yako wap?
-  - Makao makuu ya Tanesco yako Dodoma barabara ya dar es salaam mkabala na hospitali ya aga khan.
-- - Naweza pata mita zaidi ya moja kwaajili ya wapangaji wangu
-  - Tafadhali fika ofisi za Tanesco ilioko karibu na wewe au piga namba 0748550000 Ahsante!
-- - Nina tatizo
-  - karibu tukufudumie tatizo lako!
-- - Nina shida
-  - Karibu tukufudumie tatizo lako!
-
-- - Mita yangu haioneshi matumizi yoyote.
-
-  - Tafadhali hakikisha mita imewashwa ipasavyo, au wasiliana na ofisi ya TANESCO kwa msaada zaidi.
-
-- - Nawezaje kujua deni langu la umeme?
-
-  - Tuma namba ya mita yako kwa huduma kwa wateja au tembelea ofisi ya TANESCO karibu nawe.
-
-- - Umeme unakatika mara kwa mara kila saa nne.
-
-  - Pole kwa usumbufu. Inawezekana kuna matatizo ya laini au matengenezo. Tunaendelea kufanyia kazi changamoto hii.
-
-- - Nimefungiwa umeme kwa sababu ya deni.
-
-  - Tafadhali lipia deni lako kupitia njia rasmi kisha wasiliana na TANESCO kwa ajili ya kurejeshewa huduma.
-
-- - Nawezaje kupata nakala ya bili ya umeme?
-
-  - Tembelea ofisi za TANESCO au piga simu kwa huduma kwa wateja na utapewa nakala ya bili yako.
-
-- - Je, kuna programu ya simu ya TANESCO?
-
-  - Ndiyo, unaweza kupakua app ya Nikonekt kupitia Google Play Store au App Store kwa huduma mbalimbali.
-
-- - Kuna lini matengenezo ya umeme yataisha?
-
-  - Tafadhali fuatilia tangazo la TANESCO kupitia tovuti au mitandao ya kijamii ili ujue muda rasmi wa kurejesha huduma.
-
-- - Nimeweka tokeni lakini umeme haujaingia.
-
-  - Hakikisha umeingiza tokeni sahihi. Ikiendelea kugoma, wasiliana na huduma kwa wateja haraka iwezekanavyo.
-
-- - Nahitaji kubadili jina kwenye akaunti ya mita.
-
-  - Tembelea ofisi za TANESCO ukiwa na nyaraka muhimu kama vile kitambulisho na hati ya umiliki wa nyumba.
-
-- - Mita yangu inaonyesha makosa (Error).
-
-  - Tafadhali tuma namba ya mita na aina ya kosa linaloonekana kwa huduma kwa wateja kwa msaada wa haraka.
+    - - Jamani tanesco
+      - unaweza kuwa na hitilafu ya muda. Tafadhali subiri dakika chache au tuma taarifa kupitia namba yetu ya huduma kwa wateja.
+    - - Nawezaje kulipa bili ya umeme?
+      - Unaweza kulipa kupitia M-Pesa, Tigo Pesa, Airtel Money, au benki yoyote iliyo karibu nawe.
+    - - Nimepoteza risiti ya malipo ya umeme.
+      - Tafadhali wasiliana na ofisi ya TANESCO au tuma ujumbe kwa huduma kwa wateja ukiambatanisha taarifa za malipo.
+    - - Nawezaje kuunganishiwa umeme mpya?
+      - Tafadhali tembelea ofisi ya TANESCO iliyo karibu au tembelea tovuti yetu kwa kujaza fomu ya maombi ya kuunganishiwa umeme.
+    - - Namba yangu ya mita ni ipi?
+      - Namba ya mita yako ina tarakimu 11 na iko kwenye kifaa cha mita au kwenye risiti ya mwisho ya malipo.
+    - - Umeme wangu hukatika kila siku jioni.
+      - Tunaomba radhi kwa usumbufu. Inawezekana kuna mzigo mkubwa kwenye laini. Tutalifanyia kazi.
+    - - Umeme wangu hukatika kila siku asubuhi.
+      - Tunaomba radhi kwa usumbufu. Inawezekana kuna mzigo mkubwa kwenye laini. Tutalifanyia kazi.
+    - - Nawezaje kuwasiliana na huduma kwa wateja?
+      - Tafadhali piga 0748 123 456 au tuma barua pepe kwa support@tanesco.co.tz
+    - - Naweza kupata taarifa ya matumizi yangu ya umeme?
+      - Ndiyo, tafadhali tuma namba yako ya mita kwa huduma kwa wateja na tutakutumia taarifa kamili.
+    - - Umeme unakatika sana wiki hii, shida ni nini?
+      - Kuna matengenezo ya miundombinu yanayoendelea. Tafadhali fuatilia tangazo rasmi kutoka TANESCO kuhusu eneo lako.
+    - - Naweza kujua mita namba yangu
+      - Ndiyo unaweza kujua kwa kuangalia rimoti yako chini ya display yenye tarakimu 13, kwa mawasiliano zaidi piga 0748550000
+    - - Eneo langu ni " "
+      - Ahsante tumepokea taarifa na samahani kwa changamoto waatalamu wetu wako site kuboresha huduma zetu. Je unachangamoto yoyote?
+    - - Napata vipi huduma ya kuunganishiwa umeme?
+      - Huduma ya kuunganishiwa umeme unaweza fanikiwa kwa njia zifatazo 1.pakua app ya nikonekt 2.tembelea tovuti ya www.nikonekt.co.tz 3.Au tembelea ofisi za tanesco zilizopo karibu na wewe!
+    - - Je kuna nafasi za kazi au ajira hapo Tanesco
+      - Hapana tunapenda kukutaarifu endelea kupitia tovuti zetu na vyombo vya habari kwa maelekezo zaidi
+    - - Je Tanesco makao makuu yake yako wap?
+      - Makao makuu ya Tanesco yako Dodoma barabara ya dar es salaam mkabala na hospitali ya aga khan.
+    - - Naweza pata mita zaidi ya moja kwaajili ya wapangaji wangu
+      - Tafadhali fika ofisi za Tanesco ilioko karibu na wewe au piga namba 0748550000 Ahsante!
+    - - Nina tatizo
+      - karibu tukufudumie tatizo lako!
+    - - Nina shida
+      - Karibu tukufudumie tatizo lako!
+    
+    - - Mita yangu haioneshi matumizi yoyote.
+    
+      - Tafadhali hakikisha mita imewashwa ipasavyo, au wasiliana na ofisi ya TANESCO kwa msaada zaidi.
+    
+    - - Nawezaje kujua deni langu la umeme?
+    
+      - Tuma namba ya mita yako kwa huduma kwa wateja au tembelea ofisi ya TANESCO karibu nawe.
+    
+    - - Umeme unakatika mara kwa mara kila saa nne.
+    
+      - Pole kwa usumbufu. Inawezekana kuna matatizo ya laini au matengenezo. Tunaendelea kufanyia kazi changamoto hii.
+    
+    - - Nimefungiwa umeme kwa sababu ya deni.
+    
+      - Tafadhali lipia deni lako kupitia njia rasmi kisha wasiliana na TANESCO kwa ajili ya kurejeshewa huduma.
+    
+    - - Nawezaje kupata nakala ya bili ya umeme?
+    
+      - Tembelea ofisi za TANESCO au piga simu kwa huduma kwa wateja na utapewa nakala ya bili yako.
+    
+    - - Je, kuna programu ya simu ya TANESCO?
+    
+      - Ndiyo, unaweza kupakua app ya Nikonekt kupitia Google Play Store au App Store kwa huduma mbalimbali.
+    
+    - - Kwa lini matengenezo ya umeme yataisha?
+    
+      - Tafadhali fuatilia tangazo la TANESCO kupitia tovuti au mitandao ya kijamii ili ujue muda rasmi wa kurejesha huduma.
+    
+    - - Nimeweka tokeni lakini umeme haujaingia.
+    
+      - Hakikisha umeingiza tokeni sahihi. Ikiendelea kugoma, wasiliana na huduma kwa wateja haraka iwezekanavyo.
+    
+    - - Nahitaji kubadili jina kwenye akaunti ya mita.
+    
+      - Tembelea ofisi za TANESCO ukiwa na nyaraka muhimu kama vile kitambulisho na hati ya umiliki wa nyumba.
+    
+    - - Mita yangu inaonyesha makosa (Error).
+    
+      - Tafadhali tuma namba ya mita na aina ya kosa linaloonekana kwa huduma kwa wateja kwa msaada wa haraka.
+    
+    - - Tutaonana baadaye
+      - Kwa heri! Tanesco tuna yaanganza maisha yako.
+    - - upo kampuni gani
+      - kwasasa niko Tanesco!
+    - - sawa asante
+      - Karibu Tanesco tuyaangaza maisha yako!
 
